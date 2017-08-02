@@ -31,9 +31,7 @@ AddEventHandler("deletedog", function()
 		SetEntityAsMissionEntity(dog, 1, 1)
 		SetEntityAsNoLongerNeeded(dog)
 		DeletePed(dog)
-		stay = false
 		follow = false
-		attack = false
 		dog = nil
 	else
 		TriggerEvent("chatMessage", "You don't have a dog to delete.")
