@@ -1,4 +1,5 @@
 local follow = false
+local invehicle = false
 local dog = nil
 
 RegisterNetEvent("spawndog")
@@ -32,6 +33,7 @@ AddEventHandler("deletedog", function()
 		SetEntityAsNoLongerNeeded(dog)
 		DeletePed(dog)
 		follow = false
+		invehicle = false
 		dog = nil
 	else
 		TriggerEvent("chatMessage", "You don't have a dog to delete.")
@@ -39,16 +41,34 @@ AddEventHandler("deletedog", function()
 	end
 end)
 
+RegisterNetEvent("vehicletoggle")
+AddEventHandler("vehicletoggle", function()
+	Citizen.CreateThread(function()
+		if invehicle ~= true then
+			local plyCoords = GetEntityCoords(GetPlayerPed(PlayerId()), 1)
+			local veh = GetClosestVehicle(plyCoords.x, plyCoords.y, plyCoords.z, 2.0, 0, 23)
+			Citizen.Trace("Closest Vehicle: " .. tostring(veh))
+			TaskEnterVehicle(dog, veh, -1, 2, 2.0, 1, 0)
+			invehicle = true
+		else
+			local dveh = GetVehiclePedIsIn(dog, false)
+			TaskLeaveVehicle(dog, dveh, 256)
+			invehicle = false
+		end
+	end)
+end)
+
  -- Follow Function --
 Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(1)
 		if not IsPlayerFreeAiming(PlayerId()) and IsControlJustPressed(1, 47) then
-			if follow ~= true then
+			if follow ~= true and invehicle ~= true then
 				if dog ~= nil then
 					--TaskFollowToOffsetOfEntity(ped, entity, offsetX, offsetY, offsetZ, movementSpeed, timeout, stoppingRange, persistFollowing)
 					TaskFollowToOffsetOfEntity(dog, GetPlayerPed(PlayerId()), 0.5, 0.0, 0.0, 5.0, -1, 0.0, 1)
 					follow = true
+					invehicle = false
 					TriggerEvent("chatMessage", "The dog is following you.")
 				else
 					TriggerEvent("chatMessage", "There is no dog to follow you.")
@@ -56,6 +76,7 @@ Citizen.CreateThread(function()
 			else
 				ClearPedTasks(dog)
 				follow = false
+				invehicle = false
 				TriggerEvent("chatMessage", "The dog is not following you.")
 			end
 		end
@@ -66,11 +87,26 @@ end)
 Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(1)
-		if IsPlayerFreeAiming(PlayerId()) and IsControlJustPressed(1, 47) then
+		if IsPlayerFreeAiming(PlayerId()) and IsControlJustPressed(1, 47) and not invehicle then
 			local isAimingAtSomething, enemy = GetEntityPlayerIsFreeAimingAt(PlayerId())
 			follow = false
+			invehicle = false
 			ClearPedTasks(dog)
 			TaskCombatPed(dog, enemy, 0, 16)
 		end
 	end
 end)
+
+
+--[[ DEBUGGING SCRIPT ]]--
+Citizen.CreateThread(function()
+	local debug = true
+	while true do
+		Citizen.Wait(2500)
+		if debug then
+			Citizen.Trace("Your Dog: " .. tostring(dog))
+			Citizen.Trace("Following Status: " .. tostring(follow))
+		end
+	end
+end)
+--]]
