@@ -1,6 +1,11 @@
 AddEventHandler("chatMessage", function(source, name, message)
 	local cm = stringsplit(message, " ")
 
+	if message == "/k9cmds" then
+		CancelEvent()
+		TriggerClientEvent("chatMessage", source, "K9 COMMANDS: /spawnk9, /deletek9, /vehicle, /k9search")
+	end
+
 	if message == "/spawnk9" then
 		CancelEvent()
 		TriggerClientEvent("spawndog", source)
@@ -12,7 +17,11 @@ AddEventHandler("chatMessage", function(source, name, message)
 	if message == "/vehicle" then
 		CancelEvent()
 		TriggerClientEvent("vehicletoggle", source)
-		print("Function Enabled")
+	end
+
+	if message == "/k9search" then
+		CancelEvent()
+		TriggerClientEvent("vehicleSearch", source)
 	end
 end)
 
