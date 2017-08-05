@@ -4,7 +4,7 @@ AddEventHandler("chatMessage", function(source, name, message)
 	if cm[1] == "/k9" then
 		CancelEvent()
 		if cm[2] == "cmds" then
-			TriggerClientEvent("chatMessage", source, "^2K9 COMMANDS:^1 /k9 spawn, /k9 delete, /k9 vehicle, /k9 search")
+			TriggerClientEvent("chatMessage", source, "^1K9 COMMANDS:^2 /k9 spawn, /k9 delete, /k9 vehicle, /k9 search")
 		elseif cm[2] == "spawn" then
 			TriggerClientEvent("spawndog", source)
 		elseif cm[2] == "delete" then
