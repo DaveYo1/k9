@@ -50,10 +50,11 @@ AddEventHandler("spawndog", function()
 			local plypos = GetOffsetFromEntityInWorldCoords(GetPlayerPed(PlayerId()), 0.0, 2.0, 0.0)
 			local plyhead = GetEntityHeading(GetPlayerPed(PlayerId()))
 			local spawned = CreatePed(28, dogmodel, plypos.x, plypos.y, plypos.z, plyhead, 1, 1)
-			SetEntityMaxSpeed(spawned, 25.0)
+			GiveWeaponToPed(spawned, GetHashKey("WEAPON_ANIMAL"), 200, true, true)
 			SetBlockingOfNonTemporaryEvents(spawned, true, false)
 			SetCanAttackFriendly(spawned, true, 1)
 			dog = spawned
+			notification("K9 Spawned")
 		else
 			TriggerEvent("chatMessage", "You can only spawn one dog.")
 			return
@@ -64,12 +65,12 @@ end)
 RegisterNetEvent("deletedog")
 AddEventHandler("deletedog", function()
 	if dog ~= nil then
-		SetEntityAsMissionEntity(dog, 1, 1)
-		SetEntityAsNoLongerNeeded(dog)
-		DeletePed(dog)
+		SetEntityAsMissionEntity(dog, true, true)
+        DeleteEntity(dog)
 		follow = false
 		invehicle = false
 		dog = nil
+		notification("K9 Deleted")
 	else
 		TriggerEvent("chatMessage", "You don't have a dog to delete.")
 		return
@@ -124,11 +125,11 @@ AddEventHandler("vehicleSearch", function()
 
 		if dog ~= nil then
 			if veh ~= 0 then
-				--TaskGoToCoordAnyMeans(dog, vehCoords.x, vehCoords.y, vehCoords.z, 5.0, 1, 1, 1, 1)
 				TaskFollowNavMeshToCoord(dog, vehCoords.x, vehCoords.y, vehCoords.z, 5.0, -1, 2.0, 1, 1)
 				Citizen.Wait(5000)
 				TaskAchieveHeading(dog, vehHead - 270, -1)
 				Citizen.Wait(5000)
+				notification("Your K9 is searching the vehicle.")
 				SetVehicleDoorOpen(veh, 0, false)
 				SetVehicleDoorOpen(veh, 1, false)
 				SetVehicleDoorOpen(veh, 2, false)
@@ -137,7 +138,7 @@ AddEventHandler("vehicleSearch", function()
 				SetVehicleDoorOpen(veh, 6, false)
 				SetVehicleDoorOpen(veh, 7, false)
 				Citizen.Wait(5000)
-				TriggerEvent("chatMessage", "Your K9 has found " .. tostring(searchstatus()) .. ".")
+				TriggerEvent("chatMessage", "Your K9 has found ^1" .. tostring(searchstatus()) .. ".")
 				Citizen.Wait(1000)
 				SetVehicleDoorShut(veh, 0, false)
 				SetVehicleDoorShut(veh, 1, false)
@@ -166,21 +167,21 @@ Citizen.CreateThread(function()
 					TaskFollowToOffsetOfEntity(dog, GetPlayerPed(PlayerId()), 0.5, 0.0, 0.0, 5.0, -1, 0.0, 1)
 					follow = true
 					invehicle = false
-					TriggerEvent("chatMessage", "The dog is following you.")
+					notification("The dog is following you.")
 				else
-					TriggerEvent("chatMessage", "There is no dog to follow you.")
+					notification("There is no dog to follow you.")
 				end
 			else
 				ClearPedTasks(dog)
 				follow = false
 				invehicle = false
-				TriggerEvent("chatMessage", "The dog is not following you.")
+				notification("The dog is not following you.")
 			end
 		end
 	end
 end)
 
--- Attack Function --
+-- Attack Function [STILL WORK IN PROGRESS DO NOT UNCOMMENT] --
 --[[
 Citizen.CreateThread(function()
 	while true do
@@ -196,22 +197,16 @@ Citizen.CreateThread(function()
 end)
 --]]
 
+--[[ Other Functions ]]--
+function notification(message)
+	SetNotificationTextEntry("STRING")
+	AddTextComponentString(message)
+	DrawNotification(0,1)
+end
+--]]
+
 
 --[[ DEBUGGING SCRIPT ]]--
-Citizen.CreateThread(function()
-	local debug = true
-	while true do
-		Citizen.Wait(2500)
-		if debug then
-			--Citizen.Trace("Your Dog: " .. tostring(dog))
-			--Citizen.Trace("Following Status: " .. tostring(follow))
-			--Citizen.Trace("Players ID: " .. tostring(PlayerId()))
-			--Citizen.Trace("Server ID: " .. tostring(GetPlayerServerId(PlayerId())))
-			--Citizen.Trace("Get Player From ID: " .. tostring(GetPlayerFromServerId(GetPlayerServerId(PlayerId()))))
-		end
-	end
-end)
-
 AddEventHandler("clientconsole", function(message1, message2)
 	Citizen.CreateThread(function()
 		Citizen.Trace(message1 .. message2)
