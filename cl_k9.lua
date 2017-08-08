@@ -209,6 +209,12 @@ end)
 
 
 --[[ Other Functions ]]--
+RegisterNetEvent("sendPlayerPed")
+AddEventHandler("sendPlayerPed", function()
+	local getPedModel = GetEntityModel(GetPlayerPed(PlayerId()))
+	TriggerServerEvent("recievePlayerPed", getPedModel)
+end)
+
 function notification(message)
 	SetNotificationTextEntry("STRING")
 	AddTextComponentString(message)
