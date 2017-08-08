@@ -5,33 +5,57 @@ local dog = nil
 local items = {
 	legal = {
 		"nothing",
+		"nothing",
 		"a pair of socks",
 		"box of condoms",
+		"nothing",
 		"nothing",
 		"one gram of marijuana",
 		"two grams of marijuana",
 		"nothing",
+		"nothing",
 		"pack of cigarettes",
 		"six pack of beer",
+		"nothing",
 		"nothing"
 	},
 	illegal = {
+		"nothing",
+		"nothing",
 		"open beer container",
 		"one kilo of marijuana",
+		"nothing",
+		"nothing",
 		"one kilo of marijuana with a scale and small baggies",
 		"two kilos of marijuana",
+		"nothing",
+		"nothing",
 		"two kilos of marijuana with a scale and small baggies",
-		"heroin needle",
+		"a heroin needle",
+		"nothing",
+		"nothing",
 		"heroin needles"
 	},
 	majorillegal = {
 		"one kilo of cocaine",
+		"nothing",
+		"nothing",
+		"nothing",
 		"two kilos of cocaine",
-		"brief case of cocaine",
+		"a brief case of cocaine",
+		"nothing",
+		"nothing",
+		"nothing",
 		"two brief cases of cocaine",
 		"one meth rock",
-		"dime bag of meth",
-		"plastic bag of meth with a scale"
+		"nothing",
+		"nothing",
+		"nothing",
+		"a dime bag of meth",
+		"plastic baggies of meth with a scale",
+		"nothing",
+		"nothing",
+		"nothing"
 	},
 }
 
@@ -52,7 +76,7 @@ AddEventHandler("spawndog", function()
 			local spawned = CreatePed(28, dogmodel, plypos.x, plypos.y, plypos.z, plyhead, 1, 1)
 			GiveWeaponToPed(spawned, GetHashKey("WEAPON_ANIMAL"), 200, true, true)
 			SetBlockingOfNonTemporaryEvents(spawned, true, false)
-			SetCanAttackFriendly(spawned, true, 1)
+			SetPedFleeAttributes(spawned, 0, 0)
 			dog = spawned
 			notification("K9 Spawned")
 		else
@@ -122,6 +146,8 @@ AddEventHandler("vehicleSearch", function()
 		Citizen.Trace(veh)
 		local vehCoords = GetOffsetFromEntityInWorldCoords(veh, 3.0, 0.0, 0.0)
 		local vehHead = GetEntityHeading(veh)
+		follow = false
+		invehicle = false
 
 		if dog ~= nil then
 			if veh ~= 0 then
@@ -162,7 +188,7 @@ Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(1)
 		if not IsPlayerFreeAiming(PlayerId()) and IsControlJustPressed(1, 47) then
-			if follow ~= true and invehicle ~= true then
+			if follow ~= true then
 				if dog ~= nil then
 					TaskFollowToOffsetOfEntity(dog, GetPlayerPed(PlayerId()), 0.5, 0.0, 0.0, 5.0, -1, 0.0, 1)
 					follow = true
@@ -181,21 +207,6 @@ Citizen.CreateThread(function()
 	end
 end)
 
--- Attack Function [STILL WORK IN PROGRESS DO NOT UNCOMMENT] --
---[[
-Citizen.CreateThread(function()
-	while true do
-		Citizen.Wait(1)
-		if IsPlayerFreeAiming(PlayerId()) and IsControlJustPressed(1, 47) and not invehicle then
-			local isAimingAtSomething, enemy = GetEntityPlayerIsFreeAimingAt(PlayerId())
-			follow = false
-			invehicle = false
-			ClearPedTasks(dog)
-			TaskCombatPed(dog, enemy, 0, 16)
-		end
-	end
-end)
---]]
 
 --[[ Other Functions ]]--
 function notification(message)
@@ -203,13 +214,4 @@ function notification(message)
 	AddTextComponentString(message)
 	DrawNotification(0,1)
 end
---]]
-
-
---[[ DEBUGGING SCRIPT ]]--
-AddEventHandler("clientconsole", function(message1, message2)
-	Citizen.CreateThread(function()
-		Citizen.Trace(message1 .. message2)
-	end)
-end)
 --]]
