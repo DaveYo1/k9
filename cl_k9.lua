@@ -125,13 +125,13 @@ function searchstatus()
 	local itemchoice = nil
 
 	if legalstatus == 1 then
-		local legalchoice = math.random(6)
+		local legalchoice = math.random(14)
 		itemchoice = items.legal[legalchoice]
 	elseif legalstatus == 2 then
-		local illegalchoice = math.random(7)
+		local illegalchoice = math.random(15)
 		itemchoice = items.illegal[illegalchoice]
 	elseif legalstatus == 3 then
-		local majorillegalchoice = math.random(7)
+		local majorillegalchoice = math.random(19)
 		itemchoice = items.majorillegal[majorillegalchoice]
 	end
 
