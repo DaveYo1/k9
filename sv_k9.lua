@@ -44,6 +44,11 @@ AddEventHandler("recievePlayerPed", function(ped)
 	end
 end)
 
+--RegisterServerEvent("sv:attackPlayer")
+--AddEventHandler("sv:attackPlayer", function(dog, ped)
+--	TriggerClientEvent("cl:attackPlayer", -1, dog, ped)
+--end)
+
 function checkPedMatch(ped)
 	for k in pairs( allowedpeds ) do
 		if allowedpeds[k] == ped then

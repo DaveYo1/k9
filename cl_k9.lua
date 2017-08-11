@@ -1,6 +1,7 @@
-local follow = false
+local follow    = false
+local searching = false
 local invehicle = false
-local dog = nil
+local dog       = nil
 
 local items = {
 	legal = {
@@ -151,29 +152,33 @@ AddEventHandler("vehicleSearch", function()
 
 		if dog ~= nil then
 			if veh ~= 0 then
-				TaskFollowNavMeshToCoord(dog, vehCoords.x, vehCoords.y, vehCoords.z, 5.0, -1, 2.0, 1, 1)
-				Citizen.Wait(5000)
-				TaskAchieveHeading(dog, vehHead - 270, -1)
-				Citizen.Wait(5000)
-				notification("Your K9 is searching the vehicle.")
-				SetVehicleDoorOpen(veh, 0, false)
-				SetVehicleDoorOpen(veh, 1, false)
-				SetVehicleDoorOpen(veh, 2, false)
-				SetVehicleDoorOpen(veh, 3, false)
-				SetVehicleDoorOpen(veh, 5, false)
-				SetVehicleDoorOpen(veh, 6, false)
-				SetVehicleDoorOpen(veh, 7, false)
-				Citizen.Wait(5000)
-				TriggerEvent("chatMessage", "Your K9 has found ^1" .. tostring(searchstatus()) .. ".")
-				Citizen.Wait(1000)
-				SetVehicleDoorShut(veh, 0, false)
-				SetVehicleDoorShut(veh, 1, false)
-				SetVehicleDoorShut(veh, 2, false)
-				SetVehicleDoorShut(veh, 3, false)
-				SetVehicleDoorShut(veh, 4, false)
-				SetVehicleDoorShut(veh, 5, false)
-				SetVehicleDoorShut(veh, 6, false)
-				SetVehicleDoorShut(veh, 7, false)
+				if searching == false then
+					searching = true
+					TaskFollowNavMeshToCoord(dog, vehCoords.x, vehCoords.y, vehCoords.z, 5.0, -1, 2.0, 1, 1)
+					Citizen.Wait(5000)
+					TaskAchieveHeading(dog, vehHead - 270, -1)
+					Citizen.Wait(5000)
+					notification("Your K9 is searching the vehicle.")
+					SetVehicleDoorOpen(veh, 0, false)
+					SetVehicleDoorOpen(veh, 1, false)
+					SetVehicleDoorOpen(veh, 2, false)
+					SetVehicleDoorOpen(veh, 3, false)
+					SetVehicleDoorOpen(veh, 5, false)
+					SetVehicleDoorOpen(veh, 6, false)
+					SetVehicleDoorOpen(veh, 7, false)
+					Citizen.Wait(5000)
+					TriggerEvent("chatMessage", "Your K9 has found ^1" .. tostring(searchstatus()) .. ".")
+					Citizen.Wait(1000)
+					SetVehicleDoorShut(veh, 0, false)
+					SetVehicleDoorShut(veh, 1, false)
+					SetVehicleDoorShut(veh, 2, false)
+					SetVehicleDoorShut(veh, 3, false)
+					SetVehicleDoorShut(veh, 4, false)
+					SetVehicleDoorShut(veh, 5, false)
+					SetVehicleDoorShut(veh, 6, false)
+					SetVehicleDoorShut(veh, 7, false)
+					searching = false
+				end
 			else
 				TriggerEvent("chatMessage", "You are too far away from the vehicle. Get Closer!")
 			end
@@ -182,6 +187,22 @@ AddEventHandler("vehicleSearch", function()
 		end
 	end)
 end)
+
+-- Attack Function --
+--RegisterNetEvent("cl:attackPlayer")
+--AddEventHandler("cl:attackPlayer", function(k9dog, otherPed)
+--	TaskPutPedDirectlyIntoMelee(k9dog, otherPed, 0.0, -1.0, 0.0, 0.0)
+--end)
+
+--Citizen.CreateThread(function()
+--	while true do
+--		Citizen.Wait(1)
+--		if IsControlJustPressed(1, 47) and IsPlayerFreeAiming(PlayerId()) then
+--			local bool, enemyPed = GetEntityPlayerIsFreeAimingAt(PlayerId())
+--			TriggerServerEvent("sv:attackPlayer", dog, enemyPed)
+--		end
+--	end
+--end)
 
  -- Follow Function --
 Citizen.CreateThread(function()
