@@ -91,7 +91,7 @@ RegisterNetEvent("deletedog")
 AddEventHandler("deletedog", function()
 	if dog ~= nil then
 		SetEntityAsMissionEntity(dog, true, true)
-        DeleteEntity(dog)
+        		DeleteEntity(dog)
 		follow = false
 		invehicle = false
 		dog = nil
@@ -215,8 +215,6 @@ Citizen.CreateThread(function()
 					follow = true
 					invehicle = false
 					notification("The dog is following you.")
-				else
-					notification("There is no dog to follow you.")
 				end
 			else
 				ClearPedTasks(dog)
