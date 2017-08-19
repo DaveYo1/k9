@@ -141,18 +141,18 @@ end
 
 RegisterNetEvent("vehicleSearch")
 AddEventHandler("vehicleSearch", function()
-	Citizen.CreateThread(function()
-		local plyCoords = GetEntityCoords(GetPlayerPed(PlayerId()), false)
-		local veh = GetClosestVehicle(plyCoords.x, plyCoords.y, plyCoords.z, 3.0, 0, 23)
-		Citizen.Trace(veh)
-		local vehCoords = GetOffsetFromEntityInWorldCoords(veh, 3.0, 0.0, 0.0)
-		local vehHead = GetEntityHeading(veh)
-		follow = false
-		invehicle = false
+	local plyCoords = GetEntityCoords(GetPlayerPed(PlayerId()), false)
+	local veh = GetClosestVehicle(plyCoords.x, plyCoords.y, plyCoords.z, 3.0, 0, 23)
+	Citizen.Trace(veh)
+	local vehCoords = GetOffsetFromEntityInWorldCoords(veh, 3.0, 0.0, 0.0)
+	local vehHead = GetEntityHeading(veh)
+	follow = false
+	invehicle = false
 
-		if dog ~= nil then
-			if veh ~= 0 then
-				if searching == false then
+	if dog ~= nil then
+		if veh ~= 0 then
+			if searching == false then
+				if IsPedInAnyVehicle(dog, false) == false or IsPedInAnyVehicle(dog, false) == 0 then
 					searching = true
 					TaskFollowNavMeshToCoord(dog, vehCoords.x, vehCoords.y, vehCoords.z, 5.0, -1, 2.0, 1, 1)
 					Citizen.Wait(5000)
@@ -178,14 +178,16 @@ AddEventHandler("vehicleSearch", function()
 					SetVehicleDoorShut(veh, 6, false)
 					SetVehicleDoorShut(veh, 7, false)
 					searching = false
+				else
+					TriggerEvent("chatMessage", "Get your dog out of the vehicle!")
 				end
-			else
-				TriggerEvent("chatMessage", "You are too far away from the vehicle. Get Closer!")
 			end
 		else
-			TriggerEvent("chatMessage", "You are not a K9 handler.")
+			TriggerEvent("chatMessage", "You are too far away from the vehicle. Get Closer!")
 		end
-	end)
+	else
+		TriggerEvent("chatMessage", "You are not a K9 handler.")
+	end
 end)
 
 -- Attack Function --
