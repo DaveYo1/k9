@@ -13,5 +13,4 @@ client_script 'cl_k9_config.lua'
 client_script '@warmenu/warmenu.lua'
 --]]
 
-server_script 'sv_k9.lua'
 client_script 'cl_k9.lua'
