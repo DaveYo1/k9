@@ -15,7 +15,6 @@ files {
 
 --[[ CONFIG ]]--
 server_script 'sv_k9_config.lua'
-client_script '@warmenu/warmenu.lua' --REMOVE
 --]]
 
 server_script 'version.lua'
