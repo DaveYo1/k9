@@ -20,7 +20,7 @@ K9_Config.PedList = {
 	"s_m_y_swat_01",
 	-- Ranger --
 	"s_m_y_ranger_01",
-	"s_f_y_ranger_01",
+	"s_f_y_ranger_01"
 }
 
 K9_Config.VehicleList = {
@@ -34,7 +34,7 @@ K9_Config.VehicleList = {
 	"PRANGER", -- Pranger
 	"RIOT", -- Riot
 	"SHERIFF", -- Sheriff
-	"SHERIFF2", -- Sheriff2
+	"SHERIFF2" -- Sheriff2
 }
 
 K9_Config.Items = {
@@ -43,7 +43,7 @@ K9_Config.Items = {
 		"Marijuana",
 		"Crack Cocaine",
 		"Bath Salts",
-		"Heroin",
+		"Heroin"
 	},
 	suspicious = {
 		"Open Alcahol Container(s)",
@@ -51,13 +51,13 @@ K9_Config.Items = {
 		"Marijuana Stem(s)",
 		"Large Wad of Cash",
         "Scale",
-        "Small Baggies",
+        "Small Baggies"
 	},
 	legal = {
 		"Dirty Socks",
 		"Bag(s) of candy",
 		"Empty Food Wrapper(s)",
 		"Empty Cup(s)",
-		"Change",
+		"Change"
     },
 }

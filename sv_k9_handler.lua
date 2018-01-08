@@ -28,6 +28,7 @@ end)
     -- Toggling Dog In / Out of a vehicle.
 RegisterServerEvent("K9:SendVehicleSettings")
 AddEventHandler("K9:SendVehicleSettings", function()
+    print("K9:SendVehicleSettings Triggered")
     local id = source
     TriggerClientEvent("K9:Vehicle", id, {
         isRestricted = K9_Config.VehicleRestricted,

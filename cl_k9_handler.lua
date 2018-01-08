@@ -8,7 +8,7 @@ local current_dog = nil
 local following = false
 local attacking = false
 local animation_played = nil
-local dog_name = "Max"
+local dog_name = "DefaultNameHere"
 
 local closest_vehicle = nil
 local closest_door_name = nil
@@ -39,8 +39,16 @@ AddEventHandler("K9:ToggleDog", function(data)
 		BeginTextCommandSetBlipName("STRING");
 		AddTextComponentString(tostring("K9"))
 		EndTextCommandSetBlipName(blip)
+
+		NetworkRegisterEntityAsNetworked(current_dog)
+		while not NetworkGetEntityIsNetworked(current_dog) do
+			NetworkRegisterEntityAsNetworked(current_dog)
+			Citizen.Wait(1)
+		end
+
 		if data.godmode == true then
 			SetEntityInvincible(spawned_entity, true)
+			SetPedCanRagdoll(spawned_entity, false)
 		end
 		Notification("Your dog " .. dog_name .. " is in service.")
 	else
@@ -53,31 +61,25 @@ end)
 
 RegisterNetEvent("K9:Vehicle")
 AddEventHandler("K9:Vehicle", function(data)
+	Citizen.Trace("K9:Vehicle Event Triggered")
 	if current_dog ~= nil then
 		if IsPedInAnyVehicle(current_dog, false) then
-
 			TaskLeaveVehicle(current_dog, GetVehiclePedIsIn(current_dog, false), 256)
-
 		else
 			local plyPos = GetEntityCoords(GetPlayerPed(-1), false)
 			local vehicle = GetClosestVehicle(plyPos['x'], plyPos['y'], plyPos['z'], 3.0, 0, 23)
 
 			if data.VehicleRestricted == true then
-
 				if CheckVehicleRestriction(vehicle, data.VehicleList) == true then
 					TaskEnterVehicle(current_dog, vehicle, -1, 2, 2.0, 1, 0)
 					following = false
 					attacking = false
 				end
-
 			else
-
 				TaskEnterVehicle(current_dog, vehicle, -1, 2, 2.0, 1, 0)
 				following = false
 				attacking = false
-
 			end
-
 		end
 	end
 end)
@@ -124,28 +126,21 @@ end)
 
 RegisterNetEvent("K9:Animations")
 AddEventHandler("K9:Animations", function(choice)
-
 	if animation_played ~= nil then -- Clear Animation Before Doing another action
-
 		if animation_played == "sit" then -- Sit End
 			sit(current_dog)
 		elseif animation_played == "laydown" then
 			laydown(current_dog)
 		end
-
 	else -- Start animation 
-
 		if choice == "sit" then -- Sit Start
 			sit(current_dog)
 		elseif choice == "laydown" then -- Laydown Start
 			laydown(current_dog)
 		end
-
 	end
-
 	attacking = false
 	following = false
-
 end)
 
 --[[ ANIMATION FUNCTIONS ]]--
@@ -242,7 +237,7 @@ AddEventHandler('K9:Search', function(data)
 					TaskAchieveHeading(current_dog, vHeading - 270, -1)
 					SetVehicleDoorOpen(closest_vehicle, 3, false, false)
 				end
-
+				
 				Citizen.Wait(4000)
 				TriggerEvent("chatMessage", tostring("^1K9 Found: ^0" .. RandomSearch(data.items) .. " in the " .. closest_door_name))
 				SetVehicleDoorsShut(closest_vehicle, false)
@@ -287,6 +282,11 @@ Citizen.CreateThread(function()
 	while true do
 		Citizen.Wait(0)
 
+		-- Toggle Menu
+		if IsControlPressed(1, 19) and IsControlJustPressed(1,20) then -- LEFTALT + Z
+			TriggerServerEvent('K9:SendMenuToggle')
+		end
+
 		-- Follow Key --
 		if IsControlJustPressed(1, 47) and not IsPlayerFreeAiming(PlayerId())  and current_dog ~= nil then
 			TriggerEvent("K9:Follow")
@@ -307,68 +307,60 @@ Citizen.CreateThread(function()
 	end
 end)
 
--- [[ WARMENU MENU ]] --
-Citizen.CreateThread(function()
-	WarMenu.CreateMenu('k9menu', "K9 Options")
-	WarMenu.CreateSubMenu("k9anims", "k9menu")
-	WarMenu.SetTitleBackgroundColor('k9menu', 2, 120, 217, 1.0)
-	WarMenu.SetTitleBackgroundColor('k9anims', 2, 120, 217, 1.0)
-	WarMenu.debug = false
+--[[ MENU FUNCTIONS ]]--
 
-	while true do
-		-- K9 MENU --
-	  if WarMenu.IsMenuOpened('k9menu') then
-
-			if WarMenu.Button('K9 Toggle [Spawn | Delete]') then
-		  		TriggerServerEvent('K9:SendSpawnSettings')
-		   elseif WarMenu.Button("K9 Vehicle [Enter | Exit]") then
-		  		TriggerServerEvent("K9:SendVehicleSettings")
-		   elseif WarMenu.Button(tostring("K9 Search: " .. closest_door_name)) then
-				TriggerServerEvent("K9:SendSearchSettings")
-		  	elseif WarMenu.MenuButton("K9 Animations", "k9anims") then
-
-		   elseif WarMenu.Button("Close Menu") then
-			   WarMenu.CloseMenu()
-			end
-
-	  		WarMenu.Display()
-	  elseif WarMenu.IsMenuOpened('k9anims') then
-	  		if WarMenu.Button("K9 [Sit]") then
-	  			TriggerEvent("K9:Animations", "sit")
-	  		elseif WarMenu.Button("K9 [Laydown]") then
-	  			TriggerEvent("K9:Animations", "laydown")
-	  		elseif WarMenu.MenuButton("Back", "k9menu") then
-	  			-- Go Back To Prev menu
-	  		elseif WarMenu.Button("Close Menu") then
-	  			WarMenu.CloseMenu()
-	  		end
-	  		WarMenu.Display()
-	  end
-
-	  -- Key Toggling
-	  if IsControlPressed(1, 19) and IsControlJustPressed(1,20) then -- LEFTALT + Z
-	  		TriggerServerEvent('K9:SendMenuToggle')
-	  end
-
-	  Citizen.Wait(0)
-	end
-end)
-
--- Converted to check server config file.
 RegisterNetEvent("K9:OpenMenu")
 AddEventHandler("K9:OpenMenu", function(data)
-	if data.isRestricted == true then
-		if CheckPedRestriction(GetPlayerPed(-1), data.PedList) == true then
-			GetClosestVehicleDoor()
-			WarMenu.OpenMenu('k9menu')
-		end
+	if not data.isRestricted then
+		EnableK9Menu()
 	else
-		WarMenu.OpenMenu('k9menu')
+		if CheckPedRestriction(GetPlayerPed(PlayerId()), data.PedList) == true then
+			EnableK9Menu()
+		else
+			Notification("You are not allowed to use the K9 menu.")
+		end
 	end
 end)
 
---[[ EXTRA FUNCTIONS ]]--
+function EnableK9Menu()
+	SendNUIMessage({
+		type = "enable_k9_menu"
+	})
+	SetNuiFocus(true, true)
+end
 
+function DisableK9Menu()
+	SetNuiFocus(false, false)
+end
+
+RegisterNUICallback("triggerk9animation", function(data)
+	TriggerEvent("K9:Animations", data.anim)
+end)
+
+RegisterNUICallback("triggertogglek9", function(data)
+	TriggerServerEvent('K9:SendSpawnSettings')
+end)
+
+RegisterNUICallback("triggervehicletoggle", function(data)
+	TriggerServerEvent("K9:SendVehicleSettings")
+end)
+
+RegisterNUICallback("triggerk9search", function(data)
+	GetClosestVehicleDoor()
+	TriggerServerEvent("K9:SendSearchSettings")
+end)
+
+RegisterNUICallback("recievek9name", function(data)
+	dog_name = data.name
+end)
+
+RegisterNUICallback("disablek9menu", function(data)
+	DisableK9Menu()
+end)
+
+--]]
+
+--[[ EXTRA FUNCTIONS ]]--
 -- Converted to check tables from argument
 function CheckVehicleRestriction(vehicle, VehicleList)
 	for i = 1, #VehicleList do
@@ -391,8 +383,9 @@ function CheckPedRestriction(ped, PedList)
 end
 
 function GetClosestVehicleDoor()
+	Citizen.Trace("Getting Closest Vehicle Door")
 	local plyCoords = GetEntityCoords(GetPlayerPed(PlayerId(), false))
-	local vehicle = GetClosestVehicle(plyCoords.x, plyCoords.y, plyCoords.z, 3.0, 0, 70)
+	local vehicle = GetClosestVehicle(plyCoords.x, plyCoords.y, plyCoords.z, 5.0, 0, 70)
 
 	local frontleft = GetWorldPositionOfEntityBone(vehicle, GetEntityBoneIndexByName(vehicle, "door_dside_f"))
 	local frontright = GetWorldPositionOfEntityBone(vehicle, GetEntityBoneIndexByName(vehicle, "door_pside_f"))
