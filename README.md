@@ -1,13 +1,11 @@
 # K9 Script
 This is a K9 script that uses the AI to handles the k9 functions.
 
-## Requirements
-WarMenu - https://forum.fivem.net/t/release-0-9-7-warmenu-lua-gui-framework/41249
-
 ## Installing Instructions (Make sure that WarMenu is installed before the K9)
 1. Download K9 Script From my github page.
-2. Drag the k9-master folder into your resources.(you can rename the k9-master to (k9) or whatever you want.
-3. Add your k9 resource name to your server.cfg (start k9-master).
+2. Drag the k9-master folder into your resources.
+3. Rename resource to "k9"
+4. Add your k9 resource name to your server.cfg (start k9).
 
 ## Configuration
 
